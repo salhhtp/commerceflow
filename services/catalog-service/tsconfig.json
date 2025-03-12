@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@nestjs/common": ["node_modules/@nestjs/common"],
+      "@nestjs/core": ["node_modules/@nestjs/core"]
+    },
+    "module": "commonjs",
+    "target": "ES2017",
+    "strict": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:20.10.16
+        options: --privileged
+        # Mount Docker socket if needed
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Run Services
+        run: |
+          docker compose up -d --build
+
+      - name: Wait for Services to be Ready
+        run: sleep 10
+
+      - name: Run Catalog Service e2e Tests
+        working-directory: ./services/catalog-service
+        run: npm ci && npm run test:e2e
+
+      - name: Run Order Service e2e Tests
+        working-directory: ./services/order-service
+        run: npm ci && npm run test:e2e
+
+      - name: Run Gateway e2e Tests
+        working-directory: ./gateway
+        run: npm ci && npm run test:e2e
+
+      - name: Run Integration Tests
+        run: |
+          npm install -g jest
+          jest integration.e2e-spec.ts
+
+      - name: Tear Down Services
+        run: docker compose down
